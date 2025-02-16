@@ -23,6 +23,7 @@ from objx.locater import find
 from objx.objects import Object, fmt, items
 from objx.persist import Workdir, long, skel, types
 from objr.command import Commands, command, parse
+from objr.excepts import errors
 from objr.package import Table
 from objr.reactor import Client, Default, Message
 from objr.threads import launch
@@ -88,7 +89,8 @@ class CLI(Client):
         pass
 
     def raw(self, txt):
-        print(txt.encode('utf-8', 'replace').decode("utf-8"))
+        if "v" in cfg.opts:
+            print(txt.encode('utf-8', 'replace').decode("utf-8"))
 
 
 class Console(CLI):
@@ -282,6 +284,8 @@ if __name__ == "__main__":
     percall = (endtime-STARTTIME)/(nrs*nrcommand)
     if "b" in cfg.opts:
         Thread.bork = True
+    for line in errors():
+        print(line)
     if "v" in cfg.opts:
         if events:
             for evt in events:

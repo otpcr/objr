@@ -10,6 +10,9 @@ import time
 import typing
 
 
+from .excepts import later
+
+
 lock = threading.RLock()
 
 
@@ -31,9 +34,9 @@ class Thread(threading.Thread):
         try:
             self.result = func(*args)
         except Exception as ex:
+            later(ex)
             if args and "ready" in dir(args[0]):
                 args[0].ready()
-                raise ex
 
     def join(self, timeout=None) -> typing.Any:
         super().join(timeout)

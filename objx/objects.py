@@ -166,12 +166,13 @@ def loads(string, *args, **kw) -> Object:
 
 
 def read(obj, pth):
-    with open(pth, "r") as fpt:
-        try:
-            data = load(fpt)
-        except json.decoder.JSONDecodeError as ex:
-            raise DecodeError(pth) from ex
-        update(obj, data)
+    with lock:
+        with open(pth, "r") as fpt:
+            try:
+                data = load(fpt)
+            except json.decoder.JSONDecodeError as ex:
+                raise DecodeError(pth) from ex
+            update(obj, data)
 
 
 "encoder"
