@@ -1,0 +1,203 @@
+#!/usr/bin/env python3
+# This file is placed in the Public Domain.
+
+
+"objects"
+
+
+import os
+import queue
+import sys
+import threading
+import time
+import typing
+import _thread
+
+
+sys.path.insert(0, os.getcwd())
+
+
+from objx.locater import find
+from objx.objects import fmt
+from objx.persist import Workdir, long, types
+from objr.command import Commands, command, parse
+from objr.package import Table
+from objr.reactor import Client, Default, Message
+from objr.threads import launch
+
+
+if os.path.exists("mods"):
+    import mods as MODS
+else:
+    MODS = None
+
+
+"defines"
+
+
+cblock      = threading.RLock()
+displaylock = threading.RLock()
+
+
+cfg      = Default()
+cfg.name = "objx"
+
+
+p     = os.path.join
+
+
+class CLI(Client):
+
+    def __init__(self):
+        Client.__init__(self)
+        self.register("command", command)
+
+    def announce(self, txt):
+        pass
+
+    def raw(self, txt):
+        print(txt.encode('utf-8', 'replace').decode("utf-8"))
+
+
+class Console(CLI):
+
+    def announce(self, txt):
+        pass
+
+    def callback(self, evt):
+        CLI.callback(self, evt)
+        evt.wait()
+
+    def poll(self):
+        evt = Message()
+        evt.txt = input("> ")
+        evt.type = "command"
+        return evt
+
+
+"utilities"
+
+
+def banner():
+    tme = time.ctime(time.time()).replace("  ", " ")
+    print(f"{cfg.name.upper()} since {tme}")
+
+
+def check(txt):
+    args = sys.argv[1:]
+    for arg in args:
+        if not arg.startswith("-"):
+            continue
+        for c in txt:
+            if c in arg:
+                return True
+    return False
+
+
+def forever():
+    while True:
+        try:
+            time.sleep(0.1)
+        except (KeyboardInterrupt, EOFError):
+            _thread.interrupt_main()
+
+
+def scan(pkg):
+    for mod in Table.all(pkg):
+        Commands.scan(mod)
+
+
+"scripts"
+
+
+def console():
+    import readline # noqa: F401
+    Commands.add(cmd)
+    Commands.add(fnd)
+    parse(cfg, " ".join(sys.argv[1:]))
+    cfg.init = cfg.sets.init or cfg.init
+    cfg.opts = cfg.opts
+    if "v" in cfg.opts:
+        banner()
+    scan(MODS)
+    for _mod, thr in Table.inits(cfg.init, MODS.__name__):
+        if "w" in cfg.opts:
+            thr.join()
+    csl = Console()
+    csl.start()
+    forever()
+    
+
+def control():
+    if len(sys.argv) == 1:
+        return
+    Commands.add(cmd)
+    Commands.add(fnd)
+    parse(cfg, " ".join(sys.argv[1:]))
+    scan(MODS)
+    csl = CLI()
+    evt = Message()
+    evt.orig = repr(csl)
+    evt.type = "command"
+    evt.txt = cfg.otxt
+    command(evt)
+    evt.wait()
+
+
+"commands"
+
+
+def cmd(event):
+    event.reply(",".join(sorted(Commands.cmds)))
+
+
+def fnd(event):
+    if not event.rest:
+        event.reply("fnd <workdir> <type>")
+        return
+    args = event.rest.split()
+    Workdir.wdr = os.path.abspath(args[0])
+    if len(args) == 1:
+        res = sorted([x.split('.')[-1].lower() for x in types()])
+        if res:
+            event.reply(",".join(res))
+        return
+    otype = args[1]
+    clz = long(otype)
+    nmr = 0
+    for fnm, obj in list(find(clz, event.gets)):
+        event.reply(f"{nmr} {fmt(obj)}")
+        nmr += 1
+    if not nmr:
+        event.reply("no result")
+
+
+"runtime"
+
+
+def wrap(func):
+    import termios
+    old = None
+    try:
+        old = termios.tcgetattr(sys.stdin.fileno())
+    except termios.error:
+        pass
+    try:
+        func()
+    except (KeyboardInterrupt, EOFError):
+        print("")
+    finally:
+        if old:
+            termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old)
+
+
+def main():
+    if check("c"):
+        wrap(console)
+    else:
+        control()
+
+
+if __name__ == "__main__":
+    main()
+    sys.exit(0)
