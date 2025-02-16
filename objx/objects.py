@@ -16,6 +16,12 @@ lock = threading.RLock()
 p    = os.path.join
 
 
+
+class Error(Exception):
+
+    pass
+
+
 class Object:
 
     def __contains__(self, key):
@@ -30,6 +36,7 @@ class Object:
 
     def __str__(self):
         return str(self.__dict__)
+
 
 
 def construct(obj, *args, **kwargs) -> None:
@@ -124,10 +131,6 @@ def values(obj) -> [typing.Any]:
     return obj.__dict__.values()
 
 
-class DecodeError(Exception):
-
-    pass
-
 
 class Decoder(json.JSONDecoder):
 
@@ -165,8 +168,9 @@ def read(obj, pth):
             try:
                 data = load(fpt)
             except json.decoder.JSONDecodeError as ex:
-                raise DecodeError(pth) from ex
+                raise Error(pth) from ex
             update(obj, data)
+
 
 
 class Encoder(json.JSONEncoder):
@@ -207,15 +211,17 @@ def write(obj, pth):
             dump(obj, fpt, indent=4)
 
 
+
 def cdir(path):
     if not os.path.exists(os.path.dirname(path)):
         pth = pathlib.Path(path)
         pth.parent.mkdir(parents=True, exist_ok=True)
 
 
+
 def __dir__():
     return (
-        'DecoderError',
+        'Error',
         'Object',
         'construct',
         'dumps',

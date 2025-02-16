@@ -4,13 +4,13 @@
 "OBJX"
 
 
-from .objects import Object, construct, dumps, edit, fmt, fqn, items, keys
-from .objects import loads, read, update, values, write
+from .objects import Error, Object, construct, dumps, edit, fmt, fqn, items
+from .objects import keys, loads, read, update, values, write
 
 
 def __dir__():
     return (
-        'DecoderError',
+        'Error',
         'Object',
         'construct',
         'dumps',
@@ -25,3 +25,6 @@ def __dir__():
         'values',
         'write'
     )
+
+
+__all__ = __dir__()

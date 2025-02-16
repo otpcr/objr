@@ -11,7 +11,7 @@ import threading
 import typing
 
 
-from .objects import DecodeError, fqn
+from .objects import Error, fqn
 from .objects import read as fread
 from .objects import write as fwrite
 
@@ -100,7 +100,7 @@ def write(obj, pth=None):
 def __dir__():
     return (
         'Cache',
-        'DecodeError',
+        'Error',
         'Workdir',
         'cdir',
         'ident',
