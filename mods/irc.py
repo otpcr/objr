@@ -24,7 +24,7 @@ from objr.threads import launch
 
 
 IGNORE = ["PING", "PONG", "PRIVMSG"]
-NAME   = "objx"
+NAME   = "objr"
 
 
 saylock = _thread.allocate_lock()

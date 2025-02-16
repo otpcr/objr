@@ -209,8 +209,8 @@ def write(obj, pth):
 
 def cdir(path):
     if not os.path.exists(os.path.dirname(path)):
-        path = pathlib.Path(pth)
-        path.parent.mkdir(parents=True, exist_ok=True)
+        pth = pathlib.Path(path)
+        pth.parent.mkdir(parents=True, exist_ok=True)
 
 
 def __dir__():

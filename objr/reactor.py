@@ -35,6 +35,11 @@ class Default:
         return str(self.__dict__)
 
 
+class Config(Default):
+
+    pass
+
+
 class Message(Default):
 
     def __init__(self):
@@ -172,3 +177,14 @@ class Fleet:
         for bot in Fleet.bots.values():
             if "wait" in dir(bot):
                 bot.wait()
+
+
+def __dir__():
+    return (
+        'Client',
+        'Config',
+        'Default',
+        'Fleet',
+        'Message',
+        'Reactor'
+    )
