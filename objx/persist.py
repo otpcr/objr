@@ -1,7 +1,7 @@
 # This file is placed in the Public Domain.
 
 
-"disk persistence"
+"persist to disk"
 
 
 import datetime
@@ -11,35 +11,18 @@ import threading
 import typing
 
 
-from .objects import fqn
+from .objects import DecodeError, fqn
 from .objects import read as fread
 from .objects import write as fwrite
-
-
-"defines"
 
 
 p    = os.path.join
 lock = threading.RLock()
 
 
-"exceptions"
-
-
-class DecodeError(Exception):
-
-    pass
-
-
-"working directory"
-
-
 class Workdir:
 
     wdr  = ""
-
-
-"paths"
 
 
 def long(name) -> str:
@@ -71,9 +54,6 @@ def strip(pth, nmr=3) -> str:
 
 def types() -> [str]:
     return os.listdir(store())
-
-
-"cache"
 
 
 class Cache:
@@ -112,13 +92,9 @@ def read(obj, pth):
 def write(obj, pth=None):
     if pth is None:
         pth = store(ident(obj))
-    cdir(pth)
     fwrite(obj, pth)
     Cache.objs[pth] = obj
     return pth
-
-
-"interface"
 
 
 def __dir__():

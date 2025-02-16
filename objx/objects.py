@@ -16,11 +16,6 @@ lock = threading.RLock()
 p    = os.path.join
 
 
-class DecodeError(Exception):
-
-    pass
-
-
 class Object:
 
     def __contains__(self, key):
@@ -35,9 +30,6 @@ class Object:
 
     def __str__(self):
         return str(self.__dict__)
-
-
-"methods"
 
 
 def construct(obj, *args, **kwargs) -> None:
@@ -132,7 +124,9 @@ def values(obj) -> [typing.Any]:
     return obj.__dict__.values()
 
 
-"decoder"
+class DecodeError(Exception):
+
+    pass
 
 
 class Decoder(json.JSONDecoder):
@@ -175,9 +169,6 @@ def read(obj, pth):
             update(obj, data)
 
 
-"encoder"
-
-
 class Encoder(json.JSONEncoder):
 
     def __init__(self, *args, **kwargs):
@@ -211,13 +202,15 @@ def dumps(*args, **kw) -> str:
 
 def write(obj, pth):
     with lock:
-        path = pathlib.Path(pth)
-        path.parent.mkdir(parents=True, exist_ok=True)
+        cdir(pth)
         with open(pth, "w") as fpt:
             dump(obj, fpt, indent=4)
 
 
-"interface"
+def cdir(path):
+    if not os.path.exists(os.path.dirname(path)):
+        path = pathlib.Path(pth)
+        path.parent.mkdir(parents=True, exist_ok=True)
 
 
 def __dir__():

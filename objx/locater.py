@@ -99,6 +99,3 @@ def __dir__():
         'last',
         'search'
     )
-
-
-__all__ = __dir__()
