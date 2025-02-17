@@ -16,7 +16,7 @@ authors = [
 readme = "README.rst"
 license = {text="Public Domain"}
 dependencies = [
-    'objt',
+    'objx',
 ]
 classifiers = [ 
     'Development Status :: 3 - Alpha',
@@ -28,9 +28,9 @@ classifiers = [
 
 
 [project.urls]
-"home" = "https://pypi.org/rssbotd/objr"
-"bugs" = "https://github.com/rssbotd/objr/issues"
-"source" = "https://github.com/rssbotd/objr"
+"home" = "https://pypi.org/project/objr"
+"bugs" = "https://github.com/otpcr/objr/issues"
+"source" = "https://github.com/otpcr/objr"
 
 
 [tool.setuptools]
